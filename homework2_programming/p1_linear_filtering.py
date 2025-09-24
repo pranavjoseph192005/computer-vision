@@ -53,6 +53,12 @@ def gauss_kernel_generator(kernel_size: int, spatial_variance: float) -> np.ndar
     # Todo: given variance: spatial_variance and kernel size, you need to create a kernel_sizexkernel_size gaussian kernel
     # Please check out the formula in slide 15 of lecture 6 to learn how to compute the gaussian kernel weight: g[k, l] at each position [k, l].
     kernel_weights = np.zeros((kernel_size, kernel_size))
+    for k in range(-(kernel_size // 2), kernel_size // 2 + 1):
+        for l in range(-(kernel_size // 2), kernel_size // 2 + 1):
+            kernel_weights[k + kernel_size//2, l + kernel_size//2] = (1 / (2 * math.pi * spatial_variance)) * math.exp(-((k**2 + l**2) / (2 * spatial_variance)))
+
+
+
 
     return kernel_weights
  
@@ -77,7 +83,7 @@ if __name__ == "__main__":
     # Gaussian filtering
     kernel_size = 7  
     spatial_var = 15 # sigma_s^2 
-    #gaussian_filter = gauss_kernel_generator(kernel_size, spatial_var)
-    #gaussian_filter_normlized = gaussian_filter / (np.sum(gaussian_filter)+1e-16) # normalization term
-    #im_g = linear_local_filtering(img_noise, gaussian_filter_normlized) # apply the filter to process the image: img_noise
-    #cv2.imwrite('results/im_gaussian.png', im_g)
+    gaussian_filter = gauss_kernel_generator(kernel_size, spatial_var)
+    gaussian_filter_normlized = gaussian_filter / (np.sum(gaussian_filter)+1e-16) # normalization term
+    im_g = linear_local_filtering(img_noise, gaussian_filter_normlized) # apply the filter to process the image: img_noise
+    cv2.imwrite('results/im_gaussian.png', im_g)
