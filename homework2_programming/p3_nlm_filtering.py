@@ -21,6 +21,9 @@ def nlm_filtering(
     img = img / 255
     img = img.astype("float32")
     img_filtered = np.zeros(img.shape) # Placeholder of the filtered image
+    sizeX, sizeY = img.shape
+    pad = patch_size // 2 + window_size // 2
+    img = np.pad(img, pad, mode="constant", constant_values=0)
     
     # Todo: For each pixel position [i, j], you need to compute the filtered output: img_filtered[i, j] using a non-local means filter
     # step 1: compute window_sizexwindow_size filter weights of the non-local means filter in terms of intensity_variance. 
@@ -32,6 +35,25 @@ def nlm_filtering(
     # ********************************
     # Your code is here.
     # ********************************
+
+    for i in range(sizeX):
+        for j in range(sizeY):
+            pixel_sum = 0
+            W = 0
+            window_radius = window_size // 2
+            for u in range(max(0, i - window_radius), min(sizeX, i + window_radius + 1)):
+                for v in range(max(0, j - window_radius), min(sizeY, j + window_radius + 1)):
+                    ssd = 0
+                    patch_radius = patch_size // 2
+                    for k in range(-patch_radius, patch_radius + 1):
+                        for l in range(-patch_radius, patch_radius + 1):
+                            diff = img[i+k+pad, j+l+pad] - img[u+k+pad, v+l+pad]
+                            ssd += diff**2
+                    
+                    w = math.exp(-ssd / (intensity_variance * 2))
+                    pixel_sum += w * img[u+pad, v+pad]
+                    W += w
+            img_filtered[i, j] = pixel_sum / W
 
             
     img_filtered = img_filtered * 255
